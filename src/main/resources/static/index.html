@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collaboration Tool</title>
+</head>
+<body>
+
+<h2>Real-Time Editor</h2>
+<textarea id="text" rows="10" cols="50"></textarea>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+
+<script>
+    let socket = new SockJS('/ws');
+    let stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/topic/messages', function (msg) {
+            document.getElementById("text").value = msg.body;
+        });
+    });
+
+    document.getElementById("text").addEventListener("keyup", function () {
+        stompClient.send("/app/send", {}, this.value);
+    });
+</script>
+
+</body>
+</html>
